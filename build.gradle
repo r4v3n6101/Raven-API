@@ -11,8 +11,8 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$KOTLIN_VER"
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$KOTLIN_VER"
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.1"
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.1"
   }
 }
 
@@ -28,10 +28,10 @@ apply plugin: 'kotlin'
 apply plugin: 'idea'
 
 dependencies {
-  compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VER"
+  compile "org.jetbrains.kotlin:kotlin-stdlib:1.0.1"
   compile "net.minecraftforge:forge:$MC_VER-$FORGE_VER:universal"
   compile "org.apache.logging.log4j:log4j-api:$L4J2_VER"
-  compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VER"
+  compile "org.jetbrains.kotlin:kotlin-stdlib:1.0.1"
 }
 
 //================================================
@@ -90,4 +90,34 @@ uploadArchives {
 uploadArchives.onlyIf { return DEPLOY_DIR != null }
 sourceSets {
   main.java.srcDirs += 'src/main/kotlin'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+// To specify a license in the pom:
+install {
+  repositories.mavenInstaller {
+    pom.project {
+      licenses {
+        license {
+          name 'The Apache Software License, Version 2.0'
+          url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          distribution 'repo'
+        }
+      }
+    }
+  }
 }
