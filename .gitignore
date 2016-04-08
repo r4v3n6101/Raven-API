@@ -1,4 +1,8 @@
 .idea
-*.iml
+Raven-API.iml
+Raven-API.ipr
+Raven-API.iws
 out
-gen
+build
+game
+.gradle

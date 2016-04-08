@@ -56,9 +56,9 @@ object VBO {
 
     fun loadToVAO(positions: FloatArray, indices: IntArray, textureCoords: FloatArray): RawModel {
         val vaoId = createVAO()
-        bindIndices(indices)//indices'll use index of vertex instead vertices postions(xyz of vertex will be replaced by one index)
-        storeDataInAttributeList(0, 3, positions)//positions have 3 floats(It's xyz)
-        storeDataInAttributeList(1, 2, textureCoords)//textures have 2 floats(It's uv)
+        bindIndices(indices)
+        storeDataInAttributeList(0, 3, positions)
+        storeDataInAttributeList(1, 2, textureCoords)
         unbindVAO()
         return RawModel(vaoId, indices.size)
     }

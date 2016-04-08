@@ -1,123 +1,66 @@
-/*
- * Forge Kotlin Adapter build file.
- */
-
-//================================================
-// Pre-execute
-
 buildscript {
-  ext.kotlin_version = '1.0.0'
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.1"
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.1"
-  }
-}
-
-repositories {
-  maven {
-    name 'Forge'
-    url 'http://files.minecraftforge.net/maven'
-  }
-  mavenCentral()
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.0'
+    }
 }
 
 apply plugin: 'kotlin'
-apply plugin: 'idea'
+apply plugin: 'forge'
+
+idea.module.inheritOutputDirs = true
+
+version = "1.0"
+group= "ru.raven" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "Raven-API"
+
+minecraft {
+    version = "1.7.10-10.13.4.1614-1.7.10"
+    runDir = "game"
+}
 
 dependencies {
-  compile "org.jetbrains.kotlin:kotlin-stdlib:1.0.1"
-  compile "net.minecraftforge:forge:$MC_VER-$FORGE_VER:universal"
-  compile "org.apache.logging.log4j:log4j-api:$L4J2_VER"
-  compile "org.jetbrains.kotlin:kotlin-stdlib:1.0.1"
+    compile'org.jetbrains.kotlin:kotlin-stdlib:1.0.0'
+    compile 'org.jetbrains.kotlin:kotlin-runtime:1.0.0'
 }
 
-//================================================
-// Jar data
-
-// Grab system env
-def env = System.getenv()
-
-  group = "ru.raven.api"
-  archivesBaseName = "raven"
-  version = "$VERSION"
-
-  // Drone manifest
-  def droneManifest = manifest {
-    if (env.DRONE != null) {
-      attributes("Drone-Build": "true", "Drone-Build-ID": env.DRONE_BUILD_NUMBER, "Drone-Commit": env.DRONE_COMMIT,
-          "Drone-Branch": env.DRONE_BRANCH, "Drone-Repo-Slug": env.DRONE_REPO_SLUG)
-      version += "-d${env.DRONE_BUILD_NUMBER}"
-    } else {
-      attributes("Drone-Build": "false")
-    }
-  }
-
-// Version manifest
-def verManifest = manifest {
-  attributes"Forge-Version": MC_VER + "-" + FORGE_VER
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
 }
 
-//================================================
-// Jar tasks
+compileJava {
+    targetCompatibility = '1.8'
+    sourceCompatibility = '1.8'
+}
 
 jar {
-  // Merge Jenkins and Git manifests to form final manifest in final release jar
-  manifest {
-    from droneManifest, verManifest
-  }
-}
-
-
-//================================================
-// Maven deployment
-apply plugin: 'maven'
-
-if (!project.hasProperty("DEPLOY_DIR")) {
-  ext.DEPLOY_DIR = null
-}
-
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      repository(url: "file://$DEPLOY_DIR")
+    manifest {
+        attributes 'FMLAT': 'raven-api_at.cfg'
+        attributes 'FMLCorePlugin': 'gloomyfolken.hooklib.minecraft.HookLibPlugin'
+        attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
-  }
 }
 
-uploadArchives.onlyIf { return DEPLOY_DIR != null }
-sourceSets {
-  main.java.srcDirs += 'src/main/kotlin'
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
-
-// To specify a license in the pom:
-install {
-  repositories.mavenInstaller {
-    pom.project {
-      licenses {
-        license {
-          name 'The Apache Software License, Version 2.0'
-          url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-          distribution 'repo'
-        }
-      }
+processResources
+{
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version':project.version, 'mcversion':project.minecraft.version
     }
-  }
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
 }
