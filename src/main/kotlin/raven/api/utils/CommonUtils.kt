@@ -14,7 +14,6 @@ import java.time.LocalTime
  * Created by Raven6101 on 22.03.2016.
  */
 object CommonUtils {
-    private var instanceGson: Gson? = null
 
     fun rayTrace(player: EntityPlayer, length: Double): MovingObjectPosition {
         val posVec = Vec3.createVectorHelper(player.posX, player.posY + 1.62 - player.yOffset, player.posZ)
@@ -23,28 +22,22 @@ object CommonUtils {
         return player.worldObj.rayTraceBlocks(posVec, lookVec, true)
     }
 
-    val gsonInstance: Gson?
-        get() {
-            if (instanceGson == null) {
-                instanceGson = GsonBuilder().setPrettyPrinting().create()
-            }
-            return instanceGson
-        }
+    val gsonInstance: Gson = GsonBuilder().setPrettyPrinting().create()
 
     object TimeUtils {
 
         fun timeToTicks(time: LocalTime): Int {
-            var time = time
-            time = time.minusHours(6)//minecraft shifting
-            val minutes = (time.hour * 60 + time.minute).toFloat()
+            var time2 = time
+            time2 = time2.minusHours(6)//minecraft shifting
+            val minutes = (time2.hour * 60 + time2.minute).toFloat()
             return (minutes / 1440f * 24000 % 24000).toInt()
         }
 
         fun ticksToTime(time: Int): LocalTime {
-            var time = time
-            time %= 24000
-            val hour = time / 1000
-            val minutes = time % 1000.0 / 16.666666666666668
+            var time2 = time
+            time2 %= 24000
+            val hour = time2 / 1000
+            val minutes = time2 % 1000.0 / 16.666666666666668
             return LocalTime.of(hour, Math.round(minutes).toInt()).plusHours(6)
         }
     }
