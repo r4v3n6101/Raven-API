@@ -34,7 +34,7 @@ abstract class ShaderProgram(vertexShader: List<String>, fragmentShader: List<St
         if (GL20.glGetShaderi(shaderId, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
             System.err.println("Shader error: ${GL20.glGetShaderInfoLog(shaderId, java.lang.Short.MAX_VALUE.toInt())}")
         } else {
-            println("Shader loaded: $builder")
+            println("Shader loaded, id is $shaderId")
         }
         return shaderId
     }

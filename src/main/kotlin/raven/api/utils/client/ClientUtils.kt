@@ -10,7 +10,7 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
 import raven.api.opengl.shader.ShaderProgram
 import raven.api.opengl.shader.VboShader
-import raven.api.opengl.vbo.model.TexturedModel
+import raven.api.opengl.vbo.model.RawModel
 import raven.api.opengl.vbo.model.loader.ObjLoader
 import raven.api.utils.CommonUtils
 import raven.api.utils.math.vector.Matrix4f
@@ -94,10 +94,10 @@ object ClientUtils {
     }
 
     @Throws(IOException::class)
-    fun loadObjModel(model: ResourceLocation, textureId: Int): TexturedModel {
+    fun loadObjModel(model: ResourceLocation): RawModel {
         BufferedReader(InputStreamReader(getStreamFromLocation(model))).use { bufferedReader ->
             val rawModel = ObjLoader.load(bufferedReader.lines().collect(Collectors.toList<String>()))
-            return TexturedModel.fromRawModel(rawModel, textureId)
+            return rawModel
         }
     }
 

@@ -6,7 +6,6 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.*
 import raven.api.opengl.shader.VboShader
 import raven.api.opengl.vbo.model.RawModel
-import raven.api.opengl.vbo.model.TexturedModel
 import raven.api.utils.client.ClientUtils
 import raven.api.utils.math.vector.Matrix4f
 import java.io.IOException
@@ -18,21 +17,21 @@ import javax.imageio.ImageIO
 /**
  * Created by Raven6101 on 22.03.2016.
  */
+@Deprecated("Rewrite to ARB")
 object VBO {
-    private val vbos = ArrayList<Int>()
-    private val vaos = ArrayList<Int>()
+    private val vaos = ArrayList<VertexArrayObject>()
     private val textures = ArrayList<Int>()
 
-    fun render(model: TexturedModel, shader: VboShader, transformationMatrix: Matrix4f, part: Float) {
+    fun render(model: RawModel, textureId: Int, shader: VboShader, transformationMatrix: Matrix4f, part: Float) {
         shader.start()
-        GL30.glBindVertexArray(model.vaoId)
+        GL30.glBindVertexArray(model.vao.id)
         GL20.glEnableVertexAttribArray(0)
         GL20.glEnableVertexAttribArray(1)
         shader.loadTransformationMatrix(transformationMatrix)
         shader.loadViewMatrix(ClientUtils.getViewMatrix(part))
         shader.loadProjectionMatrix(ClientUtils.projectionMatrix)//TODO : check
         GL13.glActiveTexture(GL13.GL_TEXTURE0)
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.textureId)
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId)
         GL11.glDrawElements(GL11.GL_TRIANGLES, model.vertexCount, GL11.GL_UNSIGNED_INT, 0)// FIXME: 24.03.2016
         GL20.glDisableVertexAttribArray(0)
         GL20.glDisableVertexAttribArray(1)
@@ -49,46 +48,48 @@ object VBO {
     }
 
     fun free() {
-        vbos.forEach({ GL15.glDeleteBuffers(it) })
-        vaos.forEach({ GL30.glDeleteVertexArrays(it) })
+        vaos.forEach({ it.free() })
         textures.forEach({ GL11.glDeleteTextures(it) })
     }
 
     fun loadToVAO(positions: FloatArray, indices: IntArray, textureCoords: FloatArray): RawModel {
-        val vaoId = createVAO()
-        bindIndices(indices)
-        storeDataInAttributeList(0, 3, positions)
-        storeDataInAttributeList(1, 2, textureCoords)
+        val vao = createVAO()
+        bindIndices(vao, indices)
+        storeDataInAttributeList(vao, 0, 3, positions)
+        storeDataInAttributeList(vao, 1, 2, textureCoords)
         unbindVAO()
-        return RawModel(vaoId, indices.size)
+        return RawModel(vao, indices.size)
     }
 
-    private fun createVAO(): Int {
+    private fun createVAO(): VertexArrayObject {
         val vaoId = GL30.glGenVertexArrays()
+        val vao = VertexArrayObject(vaoId)
+        vaos.add(vao)
         GL30.glBindVertexArray(vaoId)
-        vaos.add(vaoId)
-        return vaoId
+        return vao
     }
 
     private fun unbindVAO() {
         GL30.glBindVertexArray(0)
     }
 
-    private fun storeDataInAttributeList(index: Int, size: Int, data: FloatArray) {
+    private fun storeDataInAttributeList(vao: VertexArrayObject, index: Int, size: Int, data: FloatArray) {
         val vboId = GL15.glGenBuffers()
-        vbos.add(vboId)
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId)
         val buffer = createFloatBuffer(data)
+        val vbo = VertexBufferObject(vboId, index, size, buffer)
+        vao.vbos.add(vbo)
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId)
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW)
         GL20.glVertexAttribPointer(index, size, GL11.GL_FLOAT, false, 0, 0)
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0)
     }
 
-    private fun bindIndices(indices: IntArray) {
+    private fun bindIndices(vao: VertexArrayObject, indices: IntArray) {
         val vboId = GL15.glGenBuffers()
-        vbos.add(vboId)
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboId)
         val buffer = createIntBuffer(indices)
+        val vbo = VertexBufferObject(vboId, buffer)
+        vao.vbos.add(vbo)
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboId)
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW)
     }
 

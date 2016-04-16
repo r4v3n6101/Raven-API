@@ -17,6 +17,7 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetHandlerPlayServer
 import java.util.*
 
+@Deprecated("old version")
 class NetworkManager(private val channelName: String) {
     private val channel: FMLEventChannel
 

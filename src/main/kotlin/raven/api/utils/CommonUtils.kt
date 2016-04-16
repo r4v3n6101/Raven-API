@@ -15,7 +15,7 @@ import java.time.LocalTime
  */
 object CommonUtils {
 
-    fun rayTrace(player: EntityPlayer, length: Double): MovingObjectPosition {
+    fun rayTrace(player: EntityPlayer, length: Double): MovingObjectPosition? {
         val posVec = Vec3.createVectorHelper(player.posX, player.posY + 1.62 - player.yOffset, player.posZ)
         val look = player.lookVec
         val lookVec = posVec.addVector(look.xCoord * length, look.yCoord * length, look.zCoord * length)

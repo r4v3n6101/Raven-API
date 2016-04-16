@@ -6,19 +6,12 @@ import org.lwjgl.opengl.GL30
 /**
  * Created by Raven6101 on 28.03.2016.
  */
-class Framebuffer(val width: Int, val height: Int, val fboId: Int, val textureId: Int,
-                  /**
-                   * for free memory
-                   */
-                  val depthBufferId: Int) {
+data class Framebuffer(val width: Int, val height: Int, val fboId: Int, var textureId: Int, val renderbufferId: Int) {
 
     fun free() {
         GL11.glDeleteTextures(textureId)
-        GL30.glDeleteRenderbuffers(depthBufferId)
+        GL30.glDeleteRenderbuffers(renderbufferId)
         GL30.glDeleteFramebuffers(fboId)
-    }
-
-    fun bind() {
-        FBO.bindFrameBuffer(fboId, width, height)
+        println("Free FBO: $fboId")
     }
 }
