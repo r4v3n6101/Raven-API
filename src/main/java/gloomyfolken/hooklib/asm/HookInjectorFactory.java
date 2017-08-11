@@ -24,7 +24,8 @@ public abstract class HookInjectorFactory {
 
         public static final MethodEnter INSTANCE = new MethodEnter();
 
-        private MethodEnter() {}
+        private MethodEnter() {
+        }
 
         @Override
         public HookInjectorMethodVisitor createHookInjector(MethodVisitor mv, int access, String name, String desc,

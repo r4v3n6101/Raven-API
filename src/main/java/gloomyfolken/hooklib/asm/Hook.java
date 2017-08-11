@@ -114,5 +114,6 @@ public @interface Hook {
      * Можно использовать только когда injectOnExit() == true и целевой метод возвращает не void.
      */
     @Target(ElementType.PARAMETER)
-    @interface ReturnValue {}
+    @interface ReturnValue {
+    }
 }

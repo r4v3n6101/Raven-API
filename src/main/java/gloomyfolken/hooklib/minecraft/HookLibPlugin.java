@@ -12,12 +12,23 @@ public class HookLibPlugin implements IFMLLoadingPlugin {
     private static boolean obf;
     private static boolean cheched;
 
-    // 1.6.x only
-    public String[] getLibraryRequestClass() {
-        return null;
+    public static boolean getObfuscated() {
+        if (!cheched) {
+            try {
+                Field deobfField = CoreModManager.class.getDeclaredField("deobfuscatedEnvironment");
+                deobfField.setAccessible(true);
+                obf = !deobfField.getBoolean(null);
+                FMLRelaunchLog.info("[HOOKLIB] " + " Obfuscated: " + obf);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            cheched = true;
+        }
+        return obf;
     }
 
     // 1.7.x only
+    @Override
     public String getAccessTransformerClass() {
         return null;
     }
@@ -38,20 +49,6 @@ public class HookLibPlugin implements IFMLLoadingPlugin {
     }
 
     @Override
-    public void injectData(Map<String, Object> data) {}
-
-    public static boolean getObfuscated() {
-        if (!cheched) {
-            try {
-                Field deobfField = CoreModManager.class.getDeclaredField("deobfuscatedEnvironment");
-                deobfField.setAccessible(true);
-                obf = !deobfField.getBoolean(null);
-                FMLRelaunchLog.info("[HOOKLIB] " + " Obfuscated: " + obf);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            cheched = true;
-        }
-        return obf;
+    public void injectData(Map<String, Object> data) {
     }
 }

@@ -28,25 +28,6 @@ public class PrimaryClassTransformer extends HookClassTransformer implements ICl
         instance = this;
     }
 
-    @Override
-    public byte[] transform(String oldName, String newName, byte[] bytecode) {
-        return transform(newName, bytecode);
-    }
-
-    @Override
-    protected HookInjectorClassVisitor createInjectorClassVisitor(ClassWriter cw, List<AsmHook> hooks) {
-        return new HookInjectorClassVisitor(cw, hooks) {
-            @Override
-            protected boolean isTargetMethod(AsmHook hook, String name, String desc) {
-                return super.isTargetMethod(hook, name, mapDesc(desc));
-            }
-        };
-    }
-
-    HashMap<String, List<AsmHook>> getHooksMap() {
-        return hooksMap;
-    }
-
     static String mapDesc(String desc) {
         if (!HookLibPlugin.getObfuscated()) return desc;
 
@@ -82,5 +63,24 @@ public class PrimaryClassTransformer extends HookClassTransformer implements ICl
         } else {
             throw new IllegalArgumentException("Can not map method type!");
         }
+    }
+
+    @Override
+    public byte[] transform(String oldName, String newName, byte[] bytecode) {
+        return transform(newName, bytecode);
+    }
+
+    @Override
+    protected HookInjectorClassVisitor createInjectorClassVisitor(ClassWriter cw, List<AsmHook> hooks) {
+        return new HookInjectorClassVisitor(cw, hooks) {
+            @Override
+            protected boolean isTargetMethod(AsmHook hook, String name, String desc) {
+                return super.isTargetMethod(hook, name, mapDesc(desc));
+            }
+        };
+    }
+
+    HashMap<String, List<AsmHook>> getHooksMap() {
+        return hooksMap;
     }
 }

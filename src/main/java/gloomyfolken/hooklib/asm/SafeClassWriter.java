@@ -19,6 +19,17 @@ import java.util.Collections;
  */
 public class SafeClassWriter extends ClassWriter {
 
+    private static Method m;
+
+    static {
+        try {
+            m = ClassLoader.class.getDeclaredMethod("findLoadedClass", String.class);
+            m.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
     public SafeClassWriter(int flags) {
         super(flags);
     }
@@ -30,11 +41,11 @@ public class SafeClassWriter extends ClassWriter {
         ArrayList<String> superClasses2 = getSuperClasses(type2, classLoader);
         int size = Math.min(superClasses1.size(), superClasses2.size());
         int i;
-        for (i = 0; i < size && superClasses1.get(i).equals(superClasses2.get(i)); i++);
+        for (i = 0; i < size && superClasses1.get(i).equals(superClasses2.get(i)); i++) ;
         if (i == 0) {
             return "java/lang/Object";
         } else {
-            return superClasses1.get(i-1);
+            return superClasses1.get(i - 1);
         }
     }
 
@@ -46,17 +57,6 @@ public class SafeClassWriter extends ClassWriter {
         }
         Collections.reverse(superclasses);
         return superclasses;
-    }
-
-    private static Method m;
-
-    static {
-        try {
-            m = ClassLoader.class.getDeclaredMethod("findLoadedClass", String.class);
-            m.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
     }
 
     private String getSuperClass(String type, ClassLoader classLoader) {
@@ -83,7 +83,8 @@ public class SafeClassWriter extends ClassWriter {
             if (input != null) {
                 try {
                     input.close();
-                } catch (IOException e){}
+                } catch (IOException e) {
+                }
             }
         }
     }

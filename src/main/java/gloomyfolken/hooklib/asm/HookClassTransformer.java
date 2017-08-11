@@ -81,7 +81,8 @@ public class HookClassTransformer {
      * Создает ClassVisitor для списка хуков.
      * Метод можно переопределить, если в ClassVisitor'e нужна своя логика для проверки,
      * является ли метод целевым (isTargetMethod())
-     * @param cw ClassWriter, который должен стоять в цепочке после этого ClassVisitor'a
+     *
+     * @param cw    ClassWriter, который должен стоять в цепочке после этого ClassVisitor'a
      * @param hooks Список хуков, вставляемых в класс
      * @return ClassVisitor, добавляющий хуки
      */
@@ -95,6 +96,7 @@ public class HookClassTransformer {
      * Стандартная реализация работает для уже загруженных классов и для классов, .class файлы которых есть
      * в classpath, но они ещё не загружены. Во втором случае происходит загрузка (но не инициализация) классов.
      * Если загрузка классов является проблемой, то можно воспользоваться SafeClassWriter.
+     *
      * @param flags Список флагов, которые нужно передать в конструктор ClassWriter'a
      * @return ClassWriter, сохраняющий трансформированный класс
      */

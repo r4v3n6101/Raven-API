@@ -23,11 +23,12 @@ import static org.objectweb.asm.Type.*;
  */
 public class AsmHook implements Cloneable, Comparable<AsmHook> {
 
+    public static final HookInjectorFactory ON_ENTER_FACTORY = MethodEnter.INSTANCE;
+    public static final HookInjectorFactory ON_EXIT_FACTORY = MethodExit.INSTANCE;
     private String targetClassName;
     private String targetMethodName;
     private List<Type> targetMethodParameters = new ArrayList<Type>(2);
     private Type targetMethodReturnType; //если не задано, то не проверяется
-
     private String hooksClassName;
     private String hookMethodName;
     // -1 - значение return
@@ -35,23 +36,21 @@ public class AsmHook implements Cloneable, Comparable<AsmHook> {
     private List<Type> hookMethodParameters = new ArrayList<Type>(2);
     private Type hookMethodReturnType = Type.VOID_TYPE;
     private boolean hasReturnValueParameter; // если в хук-метод передается значение из return
-
     private ReturnCondition returnCondition = ReturnCondition.NEVER;
     private ReturnValue returnValue = ReturnValue.VOID;
     private Object primitiveConstant;
-
     private HookInjectorFactory injectorFactory = ON_ENTER_FACTORY;
     private HookPriority priority = HookPriority.NORMAL;
-
-    public static final HookInjectorFactory ON_ENTER_FACTORY = MethodEnter.INSTANCE;
-    public static final HookInjectorFactory ON_EXIT_FACTORY = MethodExit.INSTANCE;
-
     // может быть без возвращаемого типа
     private String targetMethodDescription;
     private String hookMethodDescription;
     private String returnMethodName;
     // может быть без возвращаемого типа
     private String returnMethodDescription;
+
+    public static Builder newBuilder() {
+        return new AsmHook().new Builder();
+    }
 
     protected String getTargetClassName() {
         return targetClassName;
@@ -219,10 +218,6 @@ public class AsmHook implements Cloneable, Comparable<AsmHook> {
         } else {
             return injectorFactory.isPriorityInverted ? 1 : -1;
         }
-    }
-
-    public static Builder newBuilder() {
-        return new AsmHook().new Builder();
     }
 
     public class Builder extends AsmHook {

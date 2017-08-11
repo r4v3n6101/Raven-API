@@ -12,11 +12,11 @@ import org.objectweb.asm.commons.AdviceAdapter;
  */
 public abstract class HookInjectorMethodVisitor extends AdviceAdapter {
 
-    protected final AsmHook hook;
-    protected final HookInjectorClassVisitor cv;
     public final String methodName;
     public final Type methodType;
     public final boolean isStatic;
+    protected final AsmHook hook;
+    protected final HookInjectorClassVisitor cv;
 
     protected HookInjectorMethodVisitor(MethodVisitor mv, int access, String name, String desc,
                                         AsmHook hook, HookInjectorClassVisitor cv) {
